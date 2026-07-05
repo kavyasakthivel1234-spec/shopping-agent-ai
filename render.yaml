@@ -2,7 +2,6 @@ services:
   - type: web
     name: shopping-assistant-api
     runtime: python
-    pythonVersion: 3.12.10
     region: singapore
     plan: free
     rootDir: backend
