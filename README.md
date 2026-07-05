@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # AI Shopping Assistant Agent
 
 An AI-powered shopping assistant built with **React + Vite** (frontend) and **Python FastAPI** (backend). It uses **Groq + Llama 3** to deliver personalised product recommendations, comparisons, and review summaries through a multi-agent automation pipeline.
@@ -213,3 +214,6 @@ Frontend UI: `http://localhost:5173`
 - 🕓 **History** — Browse and clear past searches
 - 🌙 **Dark Mode** — Theme toggle with localStorage persistence
 - 📱 **Mobile Responsive** — Layouts optimised from 320 px to 1440 px
+=======
+# shopping-agent-ai
+>>>>>>> 5c662818038626450030fa62d81d4a9499e0de1e
