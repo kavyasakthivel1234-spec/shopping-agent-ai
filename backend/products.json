@@ -1,0 +1,82 @@
+[
+  {
+    "id": "sp-001",
+    "name": "Samsung Galaxy M35",
+    "price": 18000,
+    "category": "smartphone",
+    "camera": "50MP good camera with OIS",
+    "battery": "6000mAh"
+  },
+  {
+    "id": "sp-002",
+    "name": "Realme Narzo 80",
+    "price": 17000,
+    "category": "smartphone",
+    "camera": "50MP good camera",
+    "battery": "5000mAh"
+  },
+  {
+    "id": "sp-003",
+    "name": "Poco X6 Neo",
+    "price": 19500,
+    "category": "smartphone",
+    "camera": "108MP good camera",
+    "battery": "5100mAh"
+  },
+  {
+    "id": "sp-004",
+    "name": "Redmi Note 13 Pro",
+    "price": 21000,
+    "category": "smartphone",
+    "camera": "200MP good camera",
+    "battery": "5100mAh"
+  },
+  {
+    "id": "sp-005",
+    "name": "OnePlus Nord CE 3 Lite",
+    "price": 16000,
+    "category": "smartphone",
+    "camera": "108MP good camera",
+    "battery": "5000mAh"
+  },
+  {
+    "id": "sp-006",
+    "name": "Moto G85",
+    "price": 15000,
+    "category": "smartphone",
+    "camera": "50MP good camera",
+    "battery": "5000mAh"
+  },
+  {
+    "id": "sp-007",
+    "name": "Samsung Galaxy A15",
+    "price": 13000,
+    "category": "smartphone",
+    "camera": "50MP camera",
+    "battery": "5000mAh"
+  },
+  {
+    "id": "sp-008",
+    "name": "Redmi 13C",
+    "price": 10000,
+    "category": "smartphone",
+    "camera": "50MP camera",
+    "battery": "5000mAh"
+  },
+  {
+    "id": "sp-009",
+    "name": "Noise ColorFit Pro 5",
+    "price": 5000,
+    "category": "smartwatch",
+    "camera": "N/A",
+    "battery": "7-day battery life"
+  },
+  {
+    "id": "sp-010",
+    "name": "boAt Rockerz 450",
+    "price": 1500,
+    "category": "headphones",
+    "camera": "N/A",
+    "battery": "15 hours playback"
+  }
+]

@@ -1,0 +1,154 @@
+[
+  {
+    "timestamp": "2026-07-04T17:57:39.429045+00:00",
+    "query": "laptop under 30000",
+    "top_pick": {
+      "id": "amz-real-0011-1783187858",
+      "name": "ASUS Chromebook Intel Celeron Dual Core N4500 - (4 GB/64 GB EMMC Storage/Chrome OS) CX1400CKA-NK0453 Chromebook (14 Inch, Transparent Silver, 1.47 Kg)",
+      "price": 28990.0
+    },
+    "alternatives": [
+      {
+        "id": "amz-real-0004-1783187858",
+        "name": "Primebook 2 Max (2026) | 8GB RAM, 256GB UFS Storage | 15.6-Inch Full HD IPS Display | 12hrs Battery | MediaTek Helio G99 | Android 15 (PrimeOS 3.0) | Backlit Keyboard | in-Built AI (Gray)",
+        "price": 27290.0
+      },
+      {
+        "id": "amz-real-0005-1783187858",
+        "name": "Primebook 2 Pro (2026) | 8GB RAM, 128GB UFS Storage | 14.1-Inch FHD IPS Display | 14 Hours Battery | MediaTek Helio G99 | Android 15 (PrimeOS 3.0) | Backlit Keyboard | in-Built AI (Gray)",
+        "price": 24989.0
+      },
+      {
+        "id": "amz-real-0003-1783187858",
+        "name": "Lenovo Chromebook Intel Celeron N4500 (4GB RAM/64GB eMMC 5.1/11.6 Inch (29.46cm)/HD Display/2Wx2 Stereo Speakers/HD Camera/Chrome OS/Blue/1.21Kg), 82UY0014HA",
+        "price": 13990.0
+      },
+      {
+        "id": "amz-real-0013-1783187858",
+        "name": "AVITA Cosmos 2 in 1 Intel Celeron Dual Core - (4 GB/64 GB EMMC Storage/Windows 10 Home) NS12T5IN025P 2 in 1 Laptop (11.6 inches(28cm), Charcoal Grey, 1.327 kg)",
+        "price": 23990.0
+      },
+      {
+        "id": "amz-real-0007-1783187858",
+        "name": "Certified ThinkPad L480 Business Laptop | Core i5-8250U 8th Gen Processor | 8GB RAM | 128GB SSD | 14\" HD Display | Int UHD 620 Graphics | WiFi | Bluetooth | Win 11 Pro (8, GB, 128, GB)",
+        "price": 18990.0
+      }
+    ],
+    "confidence": 1.0,
+    "assistant_response": "Top pick: ASUS Chromebook Intel Celeron Dual Core N4500 - (4 GB/64 GB EMMC Storage/Chrome OS) CX1400CKA-NK0453 Chromebook (14 Inch, Transparent Silver, 1.47 Kg) — ₹28,990. 15 alternatives found."
+  },
+  {
+    "timestamp": "2026-07-04T17:57:16.699637+00:00",
+    "query": "laptop",
+    "top_pick": {
+      "id": "amz-real-0016-1783187836",
+      "name": "OmniBook 3, AMD Ryzen AI 5 330 (24GB DDR5 RAM, 1TB SSD) FHD, Anti-Glare, 15.6''/39.6cm, Win11, Office24, Glacier Silver,1.7kg, fn0074AU, FHD Camera w/Shutter, FPR, Backlit KB, Next Gen AI Laptop",
+      "price": 66990.0
+    },
+    "alternatives": [
+      {
+        "id": "amz-real-0017-1783187836",
+        "name": "IdeaPad Slim 3 Ryzen 5 40 15.6\" (39.6cm) FHD Thin and Light Laptop (16GB RAM/512GB SSD/Integrated AMD Radeon 610M Graphics/Windows 11/Microsoft 365 Basic + Office 2024/Grey/1.6Kg), 82XQ01HQIN",
+        "price": 62990.0
+      },
+      {
+        "id": "amz-real-0001-1783187836",
+        "name": "Smartchoice OmniBook 5 OLED (Previously Pavilion), Snapdragon X Processor 45 Tops (16GB LPDDR5x, 1 TB SSD), 2K 14''/35.6cm, Win11, Office24, Silver, 1.29kg, he0015QU, Multi-Day Battery, AI Laptop",
+        "price": 76990.0
+      },
+      {
+        "id": "amz-real-0009-1783187836",
+        "name": "2 Pro (2026) | 8GB RAM, 128GB UFS Storage | 14.1-Inch FHD IPS Display | 14 Hours Battery | MediaTek Helio G99 | Android 15 (PrimeOS 3.0) | Backlit Keyboard | in-Built AI (Gray)",
+        "price": 24989.0
+      },
+      {
+        "id": "amz-real-0010-1783187836",
+        "name": "Ideapad Slim 3, 13th Gen Intel Core i7 13620H, 16GB RAM, 512GB SSD, WUXGA IPS, 15.3\"/38.8cm, Win 11, Office 2024, Top Metal Cover Grey, 1.6Kg, 83K100CJIN/S1IN, Backlit KB, Laptop",
+        "price": 74990.0
+      },
+      {
+        "id": "amz-real-0011-1783187836",
+        "name": "2 Max (2026) | 8GB RAM, 256GB UFS Storage | 15.6-Inch Full HD IPS Display | 12hrs Battery | MediaTek Helio G99 | Android 15 (PrimeOS 3.0) | Backlit Keyboard | in-Built AI (Gray)",
+        "price": 27290.0
+      }
+    ],
+    "confidence": 1.0,
+    "assistant_response": "Top pick: OmniBook 3, AMD Ryzen AI 5 330 (24GB DDR5 RAM, 1TB SSD) FHD, Anti-Glare, 15.6''/39.6cm, Win11, Office24, Glacier Silver,1.7kg, fn0074AU, FHD Camera w/Shutter, FPR, Backlit KB, Next Gen AI Laptop — ₹66,990. 21 alternatives found."
+  },
+  {
+    "timestamp": "2026-07-04T17:56:07.226992+00:00",
+    "query": "laptop under 50000",
+    "top_pick": {
+      "id": "amz-real-0007-1783187766",
+      "name": "HP 15 Smartchoice, 13th Gen Intel Core i3-1315U (12GB DDR4, 512GB SSD) FHD, Anti-Glare, Micro-Edge, 15.6''/39.6cm, Win11, M365(1yr)*Office24, Silver, 1.59kg, fd0573TU, FHD Camera w/Shutter Laptop",
+      "price": 48990.0
+    },
+    "alternatives": [
+      {
+        "id": "amz-real-0019-1783187766",
+        "name": "ASUS Vivobook 15, Smartchoice,Intel Core i3 13th Gen 1315U, 16GB RAM, 512GB SSD, FHD 15.6\", Touchscreen, Win11, Office 24, M365 Basic (1Y), Quiet Blue, 1.7Kg, X1504VA-E83959WS, Intel UHD iGPU, Laptop",
+        "price": 49990.0
+      },
+      {
+        "id": "amz-real-0021-1783187766",
+        "name": "Primebook 2 Max (2026) | 8GB RAM, 256GB UFS Storage | 15.6-Inch Full HD IPS Display | 12hrs Battery | MediaTek Helio G99 | Android 15 (PrimeOS 3.0) | Backlit Keyboard | in-Built AI (Gray)",
+        "price": 27290.0
+      },
+      {
+        "id": "amz-real-0012-1783187766",
+        "name": "Lenovo IdeaPad Slim 3, Intel Core i3 13th Gen 1315U, 8GB RAM, 512GB SSD, FHD 15.6\"(39.6cm), Windows 11, Office 2024, Grey, 1.6Kg, 82X700G5IN, 1Yr ADP Free, 3 Month Game Pass Laptop",
+        "price": 47490.0
+      },
+      {
+        "id": "amz-real-0014-1783187766",
+        "name": "HP 15 255R G10, AMD Ryzen 5 7535U Hexa Core (6 Core, 12 Threads, 2.9 to Max 4.3 Ghz) (8 GB/512 GB SSD/AMD Radeon Graphics/dos) Thin and Light Laptop(15.6 inch HD Display, Matt Silver, 1.45",
+        "price": 49780.0
+      },
+      {
+        "id": "amz-real-0015-1783187766",
+        "name": "Acer Aspire Lite, AMD Ryzen 3-7330U, Office 2024 + M365 Basic,8GB RAM, 256GB SSD, Full HD IPS, 15.6\"/39.62 cm, Windows 11 Home, Steel Gray, 1.59 KG, AL15-41, Metal Body, Premium Thin and Light Laptop",
+        "price": 41990.0
+      }
+    ],
+    "confidence": 0.97,
+    "assistant_response": "Top pick: HP 15 Smartchoice, 13th Gen Intel Core i3-1315U (12GB DDR4, 512GB SSD) FHD, Anti-Glare, Micro-Edge, 15.6''/39.6cm, Win11, M365(1yr)*Office24, Silver, 1.59kg, fd0573TU, FHD Camera w/Shutter Laptop — ₹48,990. 17 alternatives found."
+  },
+  {
+    "timestamp": "2026-07-04T17:32:54.034227+00:00",
+    "query": "pilgrim hairoil",
+    "top_pick": {
+      "id": "amz-real-0011-1783186373",
+      "name": "Spanish Rosemary & Biotin Anti Hairfall Shampoo & Conditioner Set | Hair Fall Control, Hair Growth & Breakage Repair | Strengthens Weak Hair Up To 95% | Rosemary Hair Growth Care",
+      "price": 516.46
+    },
+    "alternatives": [
+      {
+        "id": "amz-real-0021-1783186373",
+        "name": "Damage Repair Hair Care Duo",
+        "price": 699.0
+      },
+      {
+        "id": "amz-real-0000-1783186373",
+        "name": "Redensyl 3%+Anagain 4% Advanced Hair Growth Serum For Scalp (50Ml) With Rosemary & Korean Black Rice, Controls Hair Fall, Stimulates, Increases Hair Density|Hairgrowth Serum For Unisex",
+        "price": 735.0
+      },
+      {
+        "id": "amz-real-0002-1783186373",
+        "name": "Korean Rice Water & Collagen Advanced Damage Repair Shampoo - 200ml | with 17 Amino Acids, Wheat Protein & 5 Ceramides | Paraben-Free | For Dry & Damaged Hair | For Women and Men",
+        "price": 188.0
+      },
+      {
+        "id": "amz-real-0004-1783186373",
+        "name": "Korean Black Rice and Rosemary Water Spray With Biotin for Hair Growth 100ml | Hair Spray for Regrowth | Thicker & Stronger Hair | Sulphate & Paraben Free I For Women & Men",
+        "price": 185.0
+      },
+      {
+        "id": "amz-real-0005-1783186373",
+        "name": "Patua & Keratin Hair SMOOTHENING SHAMPOO for Dry & Frizzy hair | Shampoo for Women & Men | Hair Smoothening & healthy scalp | 200 ml",
+        "price": 241.0
+      }
+    ],
+    "confidence": 1.0,
+    "assistant_response": "Top pick: Spanish Rosemary & Biotin Anti Hairfall Shampoo & Conditioner Set | Hair Fall Control, Hair Growth & Breakage Repair | Strengthens Weak Hair Up To 95% | Rosemary Hair Growth Care — ₹516. 20 alternatives found."
+  }
+]
