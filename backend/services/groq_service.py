@@ -6,7 +6,7 @@ AI / NLP layer — Groq (Llama 3.3 70B).
 Single responsibility: understand user intent and extract structured filters.
 Does NOT search products, does NOT generate recommendations.
 
-The class is still named GeminiService so all existing imports keep working.
+The class is named GroqService.
 
 Extracted filter schema (full):
     {
@@ -48,10 +48,9 @@ _SMALLTALK = re.compile(
 )
 
 
-class GeminiService:
+class GroqService:
     """
     Groq-backed NLP service.
-    Retains the name GeminiService for import compatibility.
     """
 
     def __init__(self):

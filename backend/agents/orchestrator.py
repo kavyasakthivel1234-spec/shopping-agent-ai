@@ -33,7 +33,7 @@ from agents.recommendation_agent import RecommendationAgent
 from agents.review_agent         import ReviewAgent
 from agents.comparison_agent     import ComparisonAgent
 
-from services.gemini_service   import GeminiService
+from services.groq_service   import GroqService
 from services.amazon_service   import AmazonService
 from services.recommendation   import RecommendationService
 from services.review_summary   import ReviewSummaryService
@@ -52,13 +52,13 @@ class ShoppingAssistantOrchestrator:
 
     def __init__(
         self,
-        gemini_service:         GeminiService         = None,
+        groq_service:           GroqService           = None,
         amazon_service:         AmazonService         = None,
         recommendation_service: RecommendationService = None,
         review_summary_service: ReviewSummaryService  = None,
         comparison_service:     ComparisonService     = None,
     ):
-        self._groq        = gemini_service         or GeminiService()
+        self._groq        = groq_service           or GroqService()
         self._amazon_svc  = amazon_service         or AmazonService()
         self._recommender = recommendation_service or RecommendationService()
         self._review_svc  = review_summary_service or ReviewSummaryService(self._groq)
@@ -85,7 +85,7 @@ class ShoppingAssistantOrchestrator:
         logger.info("[Orchestrator] Query: %r", query)
 
         # ── Smalltalk fast path ──────────────────────────────────
-        if GeminiService.is_smalltalk(query):
+        if GroqService.is_smalltalk(query):
             logger.info("[Orchestrator] Smalltalk detected")
             return {
                 "pipeline_type": "smalltalk",

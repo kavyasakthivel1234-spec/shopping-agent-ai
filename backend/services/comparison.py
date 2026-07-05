@@ -30,12 +30,12 @@ class ComparisonService:
     enabling cross-platform comparisons.
 
     Usage:
-        service = ComparisonService(gemini_service)
+        service = ComparisonService(groq_service)
         result  = service.compare_products("amz-sp-001", "fk-sp-001")
     """
 
-    def __init__(self, gemini_service):
-        self.gemini_service = gemini_service
+    def __init__(self, groq_service):
+        self.groq_service = groq_service
         # Build a unified lookup dict: id → product
         self._catalogue: dict[str, dict] = self._build_catalogue()
         logger.info(
@@ -71,7 +71,7 @@ class ComparisonService:
         product1 = self._find_product(product1_id)
         product2 = self._find_product(product2_id)
 
-        comparison = self.gemini_service.generate_comparison(product1, product2)
+        comparison = self.groq_service.generate_comparison(product1, product2)
 
         return {
             "product1":   product1,

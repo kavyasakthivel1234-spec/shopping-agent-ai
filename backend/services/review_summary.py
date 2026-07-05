@@ -4,8 +4,8 @@ review_summary.py
 Mock review summarisation service.
 
 Architecture position:
-    GeminiService     ←  called by this service
-    ReviewSummaryService ←  called by routes
+    GroqService          ←  called by this service
+    ReviewSummaryService  ←  called by routes
 
 Phase 2 uses a static review dataset stored in this file.
 In a future phase this will be replaced by reviews fetched from a
@@ -13,11 +13,11 @@ real database or third-party API.
 
 Responsibilities:
   - Provide static review data keyed by product ID
-  - Delegate summarisation to GeminiService
+  - Delegate summarisation to GroqService
   - Return a liked/disliked topic breakdown
 """
 
-from services.gemini_service import GeminiService
+from services.groq_service import GroqService
 
 # ---------------------------------------------------------------------------
 # Static review dataset
@@ -91,16 +91,16 @@ class ReviewSummaryService:
     using Gemini AI.
 
     Usage:
-        service = ReviewSummaryService(gemini_service)
+        service = ReviewSummaryService(groq_service)
         summary = service.summarise(product_id="sp-001")
     """
 
-    def __init__(self, gemini_service: GeminiService):
+    def __init__(self, groq_service: GroqService):
         """
         Args:
-            gemini_service: An initialised GeminiService instance.
+            groq_service: An initialised GroqService instance.
         """
-        self.gemini_service = gemini_service
+        self.groq_service = groq_service
 
     # ------------------------------------------------------------------
     # Public API
@@ -123,13 +123,13 @@ class ReviewSummaryService:
             }
 
         Raises:
-            RuntimeError/ValueError: Propagated from GeminiService on AI failure.
+            RuntimeError/ValueError: Propagated from GroqService on AI failure.
         """
         # Fetch reviews — fall back to default if no specific data exists
         reviews = MOCK_REVIEWS.get(product_id, DEFAULT_REVIEWS)
 
-        # Delegate AI summarisation to GeminiService
-        summary = self.gemini_service.summarise_reviews(reviews)
+        # Delegate AI summarisation to GroqService
+        summary = self.groq_service.summarise_reviews(reviews)
 
         return {
             "product_id":   product_id,

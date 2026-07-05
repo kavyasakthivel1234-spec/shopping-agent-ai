@@ -4,12 +4,12 @@ pros_cons_service.py
 Generates AI-powered pros and cons for a single product.
 
 Architecture position:
-    GeminiService  ←  called by this service
+    GroqService  ←  called by this service
     ProsConsService ←  called by routes
 
 This service is responsible for:
   - Looking up a product by ID from the catalogue
-  - Delegating the AI call to GeminiService
+  - Delegating the AI call to GroqService
   - Returning a clean pros/cons dict
 
 It has no knowledge of HTTP or response serialisation.
@@ -26,16 +26,16 @@ class ProsConsService:
     Produces AI-generated pros and cons for a given product.
 
     Usage:
-        service = ProsConsService(gemini_service)
+        service = ProsConsService(groq_service)
         result  = service.generate_pros_cons("sp-001")
     """
 
-    def __init__(self, gemini_service):
+    def __init__(self, groq_service):
         """
         Args:
-            gemini_service: An initialised GeminiService instance.
+            groq_service: An initialised GroqService instance.
         """
-        self.gemini_service = gemini_service
+        self.groq_service = groq_service
         self.products: list[dict] = self._load_products()
 
     # ------------------------------------------------------------------
@@ -59,12 +59,12 @@ class ProsConsService:
 
         Raises:
             KeyError:    If no product with the given ID exists.
-            RuntimeError/ValueError: Propagated from GeminiService on AI failure.
+            RuntimeError/ValueError: Propagated from GroqService on AI failure.
         """
         product = self._find_product(product_id)
 
-        # Delegate AI generation to GeminiService
-        result = self.gemini_service.generate_pros_cons(product)
+        # Delegate AI generation to GroqService
+        result = self.groq_service.generate_pros_cons(product)
 
         return {
             "product_id":   product["id"],

@@ -62,7 +62,7 @@ def health_check():
 
 
 # ---------------------------------------------------------------------------
-# Debug endpoint — verify product source without Gemini processing
+# Debug endpoint — verify product source without Groq processing
 # ---------------------------------------------------------------------------
 
 @app.get("/api/debug/product-source")
@@ -71,7 +71,7 @@ def debug_product_source(q: str = Query(..., description="Search query")):
     GET /api/debug/product-source?q=<query>
 
     Returns raw Amazon products (SerpAPI if key is set, otherwise mock)
-    WITHOUT any Gemini processing.
+    WITHOUT any Groq processing.
     """
     from services.amazon_service import AmazonService
     from dotenv import load_dotenv
@@ -102,7 +102,9 @@ def debug_product_source(q: str = Query(..., description="Search query")):
             }
     else:
         requirements  = {"category": q, "budget": 0, "features": [], "original_query": q}
-        mock_products = svc._search_local_catalogue(requirements)
+        from services.local_product_service import LocalProductService
+        local_svc = LocalProductService()
+        mock_products = local_svc.search_products(requirements)
         return {
             "query":          q,
             "serp_api_key":   key_status,

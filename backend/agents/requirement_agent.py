@@ -11,7 +11,7 @@ Role in the multi-agent workflow:
     Structured requirements dict
 
 This agent is the entry point of every orchestrated workflow. It wraps
-GeminiService.extract_requirements and adds:
+GroqService.extract_requirements and adds:
   - Input validation
   - Logging / tracing metadata
   - A normalised, typed output that downstream agents can rely on
@@ -20,7 +20,7 @@ Agents call services — they do NOT contain business logic themselves.
 """
 
 import logging
-from services.gemini_service import GeminiService
+from services.groq_service import GroqService
 
 logger = logging.getLogger(__name__)
 
@@ -47,12 +47,12 @@ class RequirementAgent:
     # Agent identity — used in orchestrator logs and response metadata
     NAME = "RequirementAgent"
 
-    def __init__(self, gemini_service: GeminiService):
+    def __init__(self, groq_service: GroqService):
         """
         Args:
-            gemini_service: Shared GeminiService instance (injected by orchestrator).
+            groq_service: Shared GroqService instance (injected by orchestrator).
         """
-        self.gemini_service = gemini_service
+        self.groq_service = groq_service
 
     # ------------------------------------------------------------------
     # Public API
@@ -80,13 +80,13 @@ class RequirementAgent:
             return self._error("Query must not be empty.")
 
         try:
-            requirements = self.gemini_service.extract_requirements(query.strip())
+            requirements = self.groq_service.extract_requirements(query.strip())
         except RuntimeError as exc:
-            # Gemini API unavailable
-            logger.error("[%s] Gemini API error: %s", self.NAME, exc)
+            # Groq API unavailable
+            logger.error("[%s] Groq API error: %s", self.NAME, exc)
             return self._error(f"AI service unavailable: {exc}")
         except ValueError as exc:
-            # Gemini returned unparseable JSON
+            # Groq returned unparseable JSON
             logger.error("[%s] JSON parse error: %s", self.NAME, exc)
             return self._error(f"AI response parse error: {exc}")
 

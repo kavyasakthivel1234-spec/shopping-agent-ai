@@ -1,15 +1,23 @@
 # render.yaml
 # -----------
-# Render Blueprint for the AI Shopping Assistant.
+# Render Blueprint — AI Shopping Assistant
 # Docs: https://render.com/docs/blueprint-spec
 #
-# Services:
-#   1. shopping-assistant-api      — Python FastAPI (main AI + auth backend)
-#   2. shopping-assistant-frontend — Vite/React static site
+# Two services:
+#   1. shopping-assistant-api      → Python 3.13 FastAPI backend
+#   2. shopping-assistant-frontend → Vite/React static site
+#
+# HOW TO DEPLOY:
+#   1. Push this repo to GitHub.
+#   2. Render Dashboard → New → Blueprint → connect your repo.
+#   3. Render will prompt you for all sync:false variables.
+#      Fill them in before clicking "Apply".
 
 services:
 
-  # ── Python FastAPI Backend ───────────────────────────────────────────────
+  # ────────────────────────────────────────────────────────────────────────
+  # 1. Python FastAPI Backend
+  # ────────────────────────────────────────────────────────────────────────
   - type: web
     name: shopping-assistant-api
     runtime: python
@@ -17,45 +25,66 @@ services:
     plan: free
     rootDir: backend
 
+    # Render reads runtime.txt from rootDir for the Python version
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
 
+    # Railway/Render will poll this every 30s — must return HTTP 200
     healthCheckPath: /health
 
     envVars:
+
+      # ── AI ──────────────────────────────────────────────────────────
       - key: GROQ_API_KEY
-        sync: false                        # set manually in Render dashboard
+        sync: false               # Enter in Render dashboard — never commit
       - key: MODEL_NAME
         value: llama-3.3-70b-versatile
-      - key: ALLOWED_ORIGINS
-        value: https://shopping-assistant-frontend.onrender.com
-      - key: DEBUG
-        value: "false"
-      - key: APP_VERSION
-        value: "4.0.0"
+
+      # ── Product Search ───────────────────────────────────────────────
+      - key: SERP_API_KEY
+        sync: false               # Get free key at https://serpapi.com
+
+      # ── Database ─────────────────────────────────────────────────────
       - key: MONGODB_URI
-        sync: false                        # set manually in Render dashboard
+        sync: false               # MongoDB Atlas connection string
+
+      # ── JWT Auth ─────────────────────────────────────────────────────
       - key: JWT_SECRET_KEY
-        sync: false                        # set manually in Render dashboard
+        sync: false               # Long random string — keep secret
       - key: JWT_ALGORITHM
         value: HS256
       - key: ACCESS_TOKEN_EXPIRE_DAYS
         value: "7"
+
+      # ── Email (Gmail SMTP) ───────────────────────────────────────────
       - key: EMAIL_ADDRESS
-        sync: false
+        sync: false               # kavyasakthivelskk@gmail.com
       - key: EMAIL_PASSWORD
-        sync: false
+        sync: false               # Gmail App Password (16 chars)
+
+      # ── CORS & URLs ──────────────────────────────────────────────────
+      - key: ALLOWED_ORIGINS
+        value: https://shopping-assistant-frontend.onrender.com
       - key: FRONTEND_URL
         value: https://shopping-assistant-frontend.onrender.com
-      - key: SERP_API_KEY
-        sync: false
 
+      # ── App Config ───────────────────────────────────────────────────
+      - key: APP_TITLE
+        value: AI Shopping Assistant API
+      - key: APP_VERSION
+        value: "4.0.0"
+      - key: DEBUG
+        value: "false"
+
+    # Persistent disk — survives redeploys (requires paid plan for permanence)
     disk:
-      name: data-store
+      name: shopping-data
       mountPath: /opt/render/project/src/backend/data
       sizeGB: 1
 
-  # ── Frontend (React / Vite static site) ─────────────────────────────────
+  # ────────────────────────────────────────────────────────────────────────
+  # 2. React / Vite Frontend (Static Site)
+  # ────────────────────────────────────────────────────────────────────────
   - type: static
     name: shopping-assistant-frontend
     rootDir: frontend
@@ -64,5 +93,6 @@ services:
     publishPath: ./dist
 
     envVars:
+      # Must point to the backend service URL above
       - key: VITE_API_URL
         value: https://shopping-assistant-api.onrender.com

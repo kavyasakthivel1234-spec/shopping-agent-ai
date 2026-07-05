@@ -67,21 +67,13 @@ class AmazonService:
 
     def search_products(self, requirements: dict) -> list[dict]:
         """
-        Search Amazon India using SerpAPI.
-
-        Args:
-            requirements: dict from Groq with keys:
-                searchQuery, brand, maxPrice, minPrice, minRating,
-                color, size, storage, ram, flavor, material, features
-
-        Returns:
-            list of real product dicts — empty list if nothing found.
+        Search Amazon India using SerpAPI, falling back to local mock products on failure/missing key.
         """
         if not self.api_key:
-            raise RuntimeError(
-                "SERP_API_KEY is not set in backend/.env. "
-                "Get a free key at https://serpapi.com and add it to .env."
-            )
+            print("[AmazonService] SERP_API_KEY not set. Falling back to local product catalogue.")
+            from services.local_product_service import LocalProductService
+            local_svc = LocalProductService()
+            return local_svc.search_products(requirements)
 
         search_query = requirements.get("searchQuery") or requirements.get("original_query", "")
         if not search_query:
@@ -95,21 +87,40 @@ class AmazonService:
         print(f"\n[AmazonService] Search query: \"{search_query}\"")
         logger.info("[AmazonService] SerpAPI query: %r", search_query)
 
-        raw_items = self._call_serpapi(search_query)
-        print(f"[AmazonService] SerpAPI raw response: {len(raw_items)} items")
+        try:
+            raw_items = self._call_serpapi(search_query)
+            print(f"[AmazonService] SerpAPI raw response: {len(raw_items)} items")
 
-        products  = self._normalise(raw_items, search_query)
-        filtered  = self._apply_filters(products, requirements)
+            products  = self._normalise(raw_items, search_query)
+            filtered  = self._apply_filters(products, requirements)
 
-        print(f"[AmazonService] After filtering: {len(filtered)} products")
-        if filtered:
-            print(f"[AmazonService] Top {min(3, len(filtered))} products:")
-            for i, p in enumerate(filtered[:3], 1):
-                price_str = f"₹{p['price']:,.0f}" if p["price"] else "Price N/A"
-                print(f"  {i}. {p['name']} | {price_str} | {p.get('brand') or 'N/A'} | ★{p.get('rating') or 'N/A'}")
-        print()
+            print(f"[AmazonService] After filtering: {len(filtered)} products")
+            if filtered:
+                print(f"[AmazonService] Top {min(3, len(filtered))} products:")
+                for i, p in enumerate(filtered[:3], 1):
+                    price_str = f"₹{p['price']:,.0f}" if p["price"] else "Price N/A"
+                    print(f"  {i}. {p['name']} | {price_str} | {p.get('brand') or 'N/A'} | ★{p.get('rating') or 'N/A'}")
+                
+                # Cache products in AMAZON_CATALOGUE so comparison can retrieve them by ID
+                for p in filtered:
+                    if p["id"] not in [x["id"] for x in AMAZON_CATALOGUE]:
+                        AMAZON_CATALOGUE.append(p)
+                print()
+                return filtered
+        except Exception as exc:
+            print(f"[AmazonService] SerpAPI search failed ({exc}). Falling back to local product catalogue.")
+            logger.warning("[AmazonService] SerpAPI search failed: %s", exc)
 
-        return filtered
+        from services.local_product_service import LocalProductService
+        local_svc = LocalProductService()
+        fallback_products = local_svc.search_products(requirements)
+        
+        # Also cache fallback products
+        for p in fallback_products:
+            if p["id"] not in [x["id"] for x in AMAZON_CATALOGUE]:
+                AMAZON_CATALOGUE.append(p)
+                
+        return fallback_products
 
     def raw_serpapi_search(self, query: str) -> dict:
         """Debug endpoint helper — returns raw + normalised response."""

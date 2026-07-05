@@ -23,7 +23,7 @@ from models.product_model import (
     ScoredProduct,
     Product,
 )
-from services.gemini_service    import GeminiService
+from services.groq_service    import GroqService
 from services.recommendation    import RecommendationService
 from services.comparison        import ComparisonService
 from services.pros_cons_service import ProsConsService
@@ -32,7 +32,7 @@ from services.review_summary    import ReviewSummaryService
 router = APIRouter()
 
 # ── Lazy-initialise services to avoid module-level failures ───────────────
-_ai_service:             GeminiService          | None = None
+_ai_service:             GroqService            | None = None
 _recommendation_service: RecommendationService  | None = None
 _comparison_service:     ComparisonService      | None = None
 _pros_cons_service:      ProsConsService        | None = None
@@ -42,7 +42,7 @@ _review_summary_service: ReviewSummaryService   | None = None
 def _get_ai():
     global _ai_service
     if _ai_service is None:
-        _ai_service = GeminiService()
+        _ai_service = GroqService()
     return _ai_service
 
 
@@ -100,7 +100,10 @@ def recommend(request: RecommendationRequest):
 
     try:
         raw_requirements = _get_ai().extract_requirements(query)
-        result           = _get_recommendation().recommend_products(raw_requirements)
+        from services.amazon_service import AmazonService
+        amazon_svc = AmazonService()
+        products = amazon_svc.search_products(raw_requirements)
+        result           = _get_recommendation().recommend_products(raw_requirements, product_pool=products)
     except (RuntimeError, ValueError, Exception) as exc:
         _raise_for_ai(exc)
         return   # unreachable — satisfies static analysers
