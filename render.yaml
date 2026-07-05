@@ -1,71 +1,4 @@
-
-Skip to content
-kavyasakthivel1234-spec
-shopping-agent-ai
-Repository navigation
-Code
-Issues
-Pull requests
-Actions
-Projects
-Wiki
-Security and quality
-Insights
-Settings
-Commit b651561
-kavya2005-hub
-kavya2005-hub
-committed
-6 minutes ago
-·
-Fix Render deployment and Python version
-main
-1 parent 
-269cfa7
- commit 
-b651561
-4 files changed
-
-+4
--24
-Lines changed: 4 additions & 24 deletions
-File tree
-Filter files…
-backend
-requirements.txt
-runtime.txt
-render.yaml
-runtime.txt
-Search within code
- 
-‎backend/requirements.txt‎
--1
-Lines changed: 0 additions & 1 deletion
-Original file line number	Diff line number	Diff line change
-@@ -1,7 +1,6 @@
-fastapi==0.115.5
-uvicorn[standard]==0.32.1
-pydantic[email]==2.10.3
-pydantic-core==2.27.1
-email-validator==2.2.0
-groq==0.13.0
-python-dotenv==1.0.1
-‎backend/runtime.txt‎
-+1
--1
-Lines changed: 1 addition & 1 deletion
-Original file line number	Diff line number	Diff line change
-@@ -1 +1 @@
-python-3.12.10 
-python-3.12.10
-‎render.yaml‎
-+2
--22
-Lines changed: 2 additions & 22 deletions
-Original file line number	Diff line number	Diff line change
-@@ -1,74 +1,54 @@
 services:
-  # ── 1. Python FastAPI Backend ──────────────────────────────────────────
   - type: web
     name: shopping-assistant-api
     runtime: python
@@ -73,63 +6,45 @@ services:
     region: singapore
     plan: free
     rootDir: backend
+
     buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+
     healthCheckPath: /health
+
     envVars:
       - key: GROQ_API_KEY
         sync: false
+
       - key: MODEL_NAME
         value: llama-3.3-70b-versatile
+
       - key: SERP_API_KEY
         sync: false
+
       - key: MONGODB_URI
         sync: false
+
       - key: JWT_SECRET_KEY
         sync: false
+
       - key: JWT_ALGORITHM
         value: HS256
+
       - key: ACCESS_TOKEN_EXPIRE_DAYS
         value: "7"
+
       - key: EMAIL_ADDRESS
         sync: false
+
       - key: EMAIL_PASSWORD
         sync: false
-      - key: ALLOWED_ORIGINS
-        value: https://shopping-assistant-frontend.onrender.com
-      - key: FRONTEND_URL
-        value: https://shopping-assistant-frontend.onrender.com
+
       - key: APP_TITLE
         value: AI Shopping Assistant API
+
       - key: APP_VERSION
         value: "4.0.0"
+
       - key: DEBUG
         value: "false"
-    disk:
-      name: shopping-data
-      mountPath: /opt/render/project/src/backend/data
-      sizeGB: 1
-
-  # ── 2. React / Vite Frontend (Static Site) ─────────────────────────────
-  - type: static
-    name: shopping-assistant-frontend
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    publishPath: dist
-    envVars:
-      - key: VITE_API_URL
-        value: https://shopping-assistant-api.onrender.com
-        value: https://shopping-assistant-api.onrender.com
-‎runtime.txt‎
-+1
-Lines changed: 1 addition & 0 deletions
-Original file line number	Diff line number	Diff line change
-@@ -0,0 +1 @@
-python-3.12.10
-0 commit comments
-Comments
-0
- (0)
-Comment
-You're not receiving notifications from this thread.
-
