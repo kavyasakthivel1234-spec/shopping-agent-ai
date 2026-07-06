@@ -2,115 +2,126 @@
 main.py
 -------
 FastAPI application entry point.
-
-Routers:
-  /api/auth/*          — signup, login, profile, forgot/reset password
-  /api/chats/session   — PUT: upsert user chat session (MongoDB)
-  /api/history/*       — user-isolated search history (MongoDB, JWT-protected)
-  /api/recommend       — Phase 1 + 2 recommendation endpoints
-  /api/assistant       — Phase 3 multi-agent assistant
-  /api/debug/*         — debug / audit endpoints
 """
 
 import os
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from config                       import settings
-from app.database.mongodb         import lifespan
-from app.routes.auth              import router as auth_router
-from app.routes.chat_routes       import router as chat_router
-from app.routes.history_routes    import router as history_router      # MongoDB history
+from config import settings
+from app.database.mongodb import lifespan
+from app.routes.auth import router as auth_router
+from app.routes.chat_routes import router as chat_router
+from app.routes.history_routes import router as history_router
 from routes.recommendation_routes import router as recommendation_router
-from routes.assistant_routes      import router as assistant_router
+from routes.assistant_routes import router as assistant_router
 
 app = FastAPI(
-    title       = settings.APP_TITLE,
-    description = "AI-powered multi-agent shopping assistant with MongoDB authentication",
-    version     = settings.APP_VERSION,
-    lifespan    = lifespan,
+    title=settings.APP_TITLE,
+    description="AI-powered multi-agent shopping assistant with MongoDB authentication",
+    version=settings.APP_VERSION,
+    lifespan=lifespan,
 )
 
-# ---------------------------------------------------------------------------
-# Middleware
-# ---------------------------------------------------------------------------
+# ==========================
+# CORS Configuration
+# ==========================
+
+origins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://shopping-assistant-frontend-bma0.onrender.com",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins     = settings.ALLOWED_ORIGINS,
-    allow_credentials = True,
-    allow_methods     = ["*"],
-    allow_headers     = ["*"],
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
 )
 
-# ---------------------------------------------------------------------------
+# ==========================
 # Routers
-# ---------------------------------------------------------------------------
-app.include_router(auth_router,            prefix="/api")   # /api/auth/*
-app.include_router(chat_router,            prefix="/api")   # /api/chats/*
-app.include_router(history_router,         prefix="/api")   # /api/history/* (MongoDB)
-app.include_router(recommendation_router,  prefix="/api")   # /api/recommend, etc.
-app.include_router(assistant_router,       prefix="/api")   # /api/assistant
+# ==========================
 
-# ---------------------------------------------------------------------------
-# Core endpoints
-# ---------------------------------------------------------------------------
+app.include_router(auth_router, prefix="/api")
+app.include_router(chat_router, prefix="/api")
+app.include_router(history_router, prefix="/api")
+app.include_router(recommendation_router, prefix="/api")
+app.include_router(assistant_router, prefix="/api")
+
+# ==========================
+# Health Check
+# ==========================
+
+@app.get("/")
+def root():
+    return {
+        "message": "Shopping Assistant API is running"
+    }
+
 
 @app.get("/health")
 def health_check():
-    """Liveness probe — returns HTTP 200 when the server is up."""
-    return {"status": "running", "version": settings.APP_VERSION}
+    return {
+        "status": "running",
+        "version": settings.APP_VERSION,
+    }
 
 
-# ---------------------------------------------------------------------------
-# Debug endpoint — verify product source without Groq processing
-# ---------------------------------------------------------------------------
+# ==========================
+# Debug Endpoint
+# ==========================
 
 @app.get("/api/debug/product-source")
 def debug_product_source(q: str = Query(..., description="Search query")):
-    """
-    GET /api/debug/product-source?q=<query>
-
-    Returns raw Amazon products (SerpAPI if key is set, otherwise mock)
-    WITHOUT any Groq processing.
-    """
-    from services.amazon_service import AmazonService
     from dotenv import load_dotenv
+    from services.amazon_service import AmazonService
+    from services.local_product_service import LocalProductService
+
     load_dotenv()
 
-    api_key    = os.getenv("SERP_API_KEY", "").strip()
-    key_status = "SET" if api_key else "NOT SET"
-    svc        = AmazonService()
+    api_key = os.getenv("SERP_API_KEY", "").strip()
+
+    svc = AmazonService()
 
     if api_key:
         try:
             result = svc.raw_serpapi_search(q)
+
             return {
-                "query":          q,
-                "serp_api_key":   key_status,
-                "source":         "AMAZON_SERPAPI" if result["products_found"] > 0 else "LOCAL_MOCK",
+                "query": q,
+                "source": "AMAZON_SERPAPI",
                 "products_found": result["products_found"],
-                "products":       result["products"],
+                "products": result["products"],
             }
-        except Exception as exc:
+
+        except Exception as e:
+
             return {
-                "query":          q,
-                "serp_api_key":   key_status,
-                "source":         "LOCAL_MOCK",
+                "query": q,
+                "source": "LOCAL_MOCK",
                 "products_found": 0,
-                "error":          str(exc),
-                "products":       [],
+                "error": str(e),
+                "products": [],
             }
-    else:
-        requirements  = {"category": q, "budget": 0, "features": [], "original_query": q}
-        from services.local_product_service import LocalProductService
-        local_svc = LocalProductService()
-        mock_products = local_svc.search_products(requirements)
-        return {
-            "query":          q,
-            "serp_api_key":   key_status,
-            "source":         "LOCAL_MOCK",
-            "products_found": len(mock_products),
-            "reason":         "SERP_API_KEY is not set in .env.",
-            "how_to_fix":     "1. Get a free key at https://serpapi.com  2. Add SERP_API_KEY=your_key to backend/.env  3. Restart.",
-            "products":       mock_products[:10],
-        }
+
+    local = LocalProductService()
+
+    requirements = {
+        "category": q,
+        "budget": 0,
+        "features": [],
+        "original_query": q,
+    }
+
+    products = local.search_products(requirements)
+
+    return {
+        "query": q,
+        "source": "LOCAL_MOCK",
+        "products_found": len(products),
+        "products": products[:10],
+    }
