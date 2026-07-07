@@ -2,126 +2,120 @@
 main.py
 -------
 FastAPI application entry point.
+Authentication removed — all APIs are public.
 """
 
 import os
+import logging
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from config import settings
-from app.database.mongodb import lifespan
-from app.routes.auth import router as auth_router
-from app.routes.chat_routes import router as chat_router
-from app.routes.history_routes import router as history_router
-from routes.recommendation_routes import router as recommendation_router
-from routes.assistant_routes import router as assistant_router
+from config                        import settings
+from app.database.mongodb          import lifespan
+from app.routes.chat_routes        import router as chat_router
+from app.routes.history_routes     import router as history_router
+from routes.recommendation_routes  import router as recommendation_router
+from routes.assistant_routes       import router as assistant_router
 
-app = FastAPI(
-    title=settings.APP_TITLE,
-    description="AI-powered multi-agent shopping assistant with MongoDB authentication",
-    version=settings.APP_VERSION,
-    lifespan=lifespan,
+logging.basicConfig(
+    level  = logging.INFO,
+    format = "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
+logger = logging.getLogger(__name__)
 
-# ==========================
-# CORS Configuration
-# ==========================
-
-origins = [
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "https://shopping-assistant-frontend-bma0.onrender.com",
+# ---------------------------------------------------------------------------
+# CORS
+# ---------------------------------------------------------------------------
+_cors_from_env: list[str] = [
+    o.strip()
+    for o in os.getenv("ALLOWED_ORIGINS", "").split(",")
+    if o.strip()
 ]
+
+_cors_always = [
+    "https://shopping-assistant-frontend-bma0.onrender.com",
+    "http://localhost:5173",
+    "http://localhost:3000",
+]
+
+CORS_ORIGINS: list[str] = list(dict.fromkeys(_cors_from_env + _cors_always))
+logger.info("[CORS] Allowed origins: %s", CORS_ORIGINS)
+
+# ---------------------------------------------------------------------------
+# App
+# ---------------------------------------------------------------------------
+app = FastAPI(
+    title       = settings.APP_TITLE,
+    description = "AI-powered shopping assistant — no authentication required",
+    version     = settings.APP_VERSION,
+    lifespan    = lifespan,
+)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["*"],
+    allow_origins     = CORS_ORIGINS,
+    allow_credentials = True,
+    allow_methods     = ["*"],
+    allow_headers     = ["*"],
 )
 
-# ==========================
-# Routers
-# ==========================
-
-app.include_router(auth_router, prefix="/api")
-app.include_router(chat_router, prefix="/api")
-app.include_router(history_router, prefix="/api")
+# ---------------------------------------------------------------------------
+# Routers — all public
+# ---------------------------------------------------------------------------
+app.include_router(chat_router,           prefix="/api")
+app.include_router(history_router,        prefix="/api")
 app.include_router(recommendation_router, prefix="/api")
-app.include_router(assistant_router, prefix="/api")
+app.include_router(assistant_router,      prefix="/api")
 
-# ==========================
-# Health Check
-# ==========================
+# ---------------------------------------------------------------------------
+# Health check
+# ---------------------------------------------------------------------------
 
 @app.get("/")
 def root():
-    return {
-        "message": "Shopping Assistant API is running"
-    }
+    return {"message": "Shopping Assistant API is running", "version": settings.APP_VERSION}
 
 
 @app.get("/health")
 def health_check():
     return {
-        "status": "running",
-        "version": settings.APP_VERSION,
+        "status":       "running",
+        "version":      settings.APP_VERSION,
+        "cors_origins": CORS_ORIGINS,
     }
 
 
-# ==========================
-# Debug Endpoint
-# ==========================
+# ---------------------------------------------------------------------------
+# Debug — verify product source
+# ---------------------------------------------------------------------------
 
 @app.get("/api/debug/product-source")
 def debug_product_source(q: str = Query(..., description="Search query")):
-    from dotenv import load_dotenv
-    from services.amazon_service import AmazonService
+    from services.amazon_service       import AmazonService
     from services.local_product_service import LocalProductService
 
-    load_dotenv()
-
     api_key = os.getenv("SERP_API_KEY", "").strip()
-
-    svc = AmazonService()
+    svc     = AmazonService()
 
     if api_key:
         try:
             result = svc.raw_serpapi_search(q)
-
             return {
-                "query": q,
-                "source": "AMAZON_SERPAPI",
+                "query":          q,
+                "source":         "AMAZON_SERPAPI" if result["products_found"] > 0 else "LOCAL_MOCK",
                 "products_found": result["products_found"],
-                "products": result["products"],
+                "products":       result["products"],
             }
-
-        except Exception as e:
-
-            return {
-                "query": q,
-                "source": "LOCAL_MOCK",
-                "products_found": 0,
-                "error": str(e),
-                "products": [],
-            }
-
-    local = LocalProductService()
-
-    requirements = {
-        "category": q,
-        "budget": 0,
-        "features": [],
-        "original_query": q,
-    }
-
-    products = local.search_products(requirements)
-
-    return {
-        "query": q,
-        "source": "LOCAL_MOCK",
-        "products_found": len(products),
-        "products": products[:10],
-    }
+        except Exception as exc:
+            return {"query": q, "source": "LOCAL_MOCK", "error": str(exc), "products": []}
+    else:
+        local_svc     = LocalProductService()
+        mock_products = local_svc.search_products(
+            {"category": q, "budget": 0, "features": [], "original_query": q}
+        )
+        return {
+            "query":          q,
+            "source":         "LOCAL_MOCK",
+            "products_found": len(mock_products),
+            "products":       mock_products[:10],
+        }

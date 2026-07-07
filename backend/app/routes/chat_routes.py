@@ -1,12 +1,10 @@
 """
 app/routes/chat_routes.py
 --------------------------
-User-isolated chat session backed by MongoDB.
+Anonymous chat session backed by MongoDB.
+Auth removed — sessions are stored without userId.
 
-One session per user — upsert model:
-  PUT /api/chats/session  — upsert (create or fully replace) the session
-
-All endpoints require Authorization: Bearer <token>.
+PUT /api/chats/session  — upsert the active session (no auth required)
 """
 
 import logging
@@ -19,34 +17,25 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from pydantic import BaseModel
 
 from app.database.mongodb import get_database
-from app.utils.security   import get_current_user
 
 logger = logging.getLogger(__name__)
-
 router = APIRouter(prefix="/chats", tags=["Chats"])
-
 CHATS_COLLECTION = "chats"
 
+ANONYMOUS_USER = "anonymous"
 
-# ---------------------------------------------------------------------------
-# Pydantic models
-# ---------------------------------------------------------------------------
 
 class MessageItem(BaseModel):
     id:   float
     type: str
     text: str = ""
-    data: Any = None   # shopping / comparison payload — arbitrary nested structure
+    data: Any = None
 
 
 class UpsertSessionRequest(BaseModel):
     messages: list[MessageItem]
     title:    str = ""
 
-
-# ---------------------------------------------------------------------------
-# Serialiser
-# ---------------------------------------------------------------------------
 
 def _serialise(doc: dict) -> dict:
     messages = []
@@ -61,7 +50,7 @@ def _serialise(doc: dict) -> dict:
     updated = doc.get("updatedAt")
     return {
         "id":        str(doc["_id"]),
-        "userId":    str(doc.get("userId", "")),
+        "userId":    str(doc.get("userId", ANONYMOUS_USER)),
         "title":     doc.get("title", ""),
         "messages":  messages,
         "createdAt": created.isoformat() if isinstance(created, datetime) else "",
@@ -69,30 +58,14 @@ def _serialise(doc: dict) -> dict:
     }
 
 
-# ---------------------------------------------------------------------------
-# PUT /api/chats/session  — upsert the one active session for this user
-# ---------------------------------------------------------------------------
-
-@router.put(
-    "/session",
-    summary="Upsert (create or replace) the current user's chat session",
-)
+@router.put("/session", summary="Upsert the active chat session (no auth required)")
 async def upsert_session(
-    body:         UpsertSessionRequest,
-    current_user: dict = Depends(get_current_user),
-    db:           AsyncIOMotorDatabase = Depends(get_database),
+    body: UpsertSessionRequest,
+    db:   AsyncIOMotorDatabase = Depends(get_database),
 ):
-    """
-    Create the session if it doesn't exist, or fully replace the messages
-    if it does.  One document per user — no accumulating stale sessions.
-
-    Returns the saved session.
-    """
     try:
-        user_id = str(current_user.get("id") or current_user.get("_id", ""))
-        now     = datetime.now(timezone.utc)
+        now = datetime.now(timezone.utc)
 
-        # Derive title from first user message
         title = body.title
         if not title:
             first_user = next(
@@ -103,7 +76,7 @@ async def upsert_session(
         serialised_messages = [m.model_dump() for m in body.messages]
 
         result = await db[CHATS_COLLECTION].find_one_and_update(
-            {"userId": user_id},
+            {"userId": ANONYMOUS_USER},
             {
                 "$set": {
                     "title":     title,
@@ -111,6 +84,7 @@ async def upsert_session(
                     "updatedAt": now,
                 },
                 "$setOnInsert": {
+                    "userId":    ANONYMOUS_USER,
                     "createdAt": now,
                 },
             },
@@ -118,23 +92,15 @@ async def upsert_session(
             return_document = True,
         )
 
-        # Motor returns None on some driver versions when upserting a new doc
         if result is None:
-            result = await db[CHATS_COLLECTION].find_one({"userId": user_id})
+            result = await db[CHATS_COLLECTION].find_one({"userId": ANONYMOUS_USER})
 
         saved = _serialise(result)
-        logger.info(
-            "[ChatRoutes] Session upserted id=%s msgs=%d",
-            saved["id"],
-            len(saved["messages"]),
-        )
+        logger.info("[ChatRoutes] Session upserted msgs=%d", len(saved["messages"]))
         return saved
 
     except HTTPException:
         raise
     except Exception as exc:
-        logger.error(
-            "[ChatRoutes] PUT /api/chats/session failed: %s", exc, exc_info=True
-        )
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(exc))

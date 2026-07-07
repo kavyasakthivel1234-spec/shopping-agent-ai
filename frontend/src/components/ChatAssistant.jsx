@@ -9,17 +9,11 @@
  *      Key: "sa_chat_messages"
  *      Written after every message update.
  *      Survives: tab switches, navigation between pages, F5 refresh.
- *      Cleared:  on logout (AuthContext.logout clears sessionStorage).
+ *      Cleared:  on page close (sessionStorage is tab-scoped).
  *
  *   2. MongoDB via PUT /api/chats/session  (backup, background)
  *      Written fire-and-forget after every AI response.
  *      History page reads these stored sessions independently.
- *
- * Session lifetime:
- *   - Login  → restore from sessionStorage (or empty if first login)
- *   - Navigate away and back → restored from sessionStorage
- *   - F5 refresh → restored from sessionStorage
- *   - Logout → sessionStorage cleared → next login starts fresh
  */
 
 import { useState, useRef, useEffect, useCallback } from "react";
@@ -340,9 +334,6 @@ function serialiseMessages(msgs) {
 // ─────────────────────────────────────────────────────────
 export default function ChatAssistant() {
   // Initialise from sessionStorage so the chat survives tab switches and F5.
-  // On first login sessionStorage is empty → starts fresh.
-  // On logout AuthContext.logout() calls sessionStorage.clear() → next
-  // login also starts fresh.
   const [messages,      setMessages]      = useState(() => loadFromSession());
   const [input,         setInput]         = useState("");
   const [isLoading,     setIsLoading]     = useState(false);
@@ -396,14 +387,12 @@ export default function ChatAssistant() {
 
     const controller = new AbortController();
     const timeout    = setTimeout(() => controller.abort(), 45_000);
-    const authToken  = localStorage.getItem("sa_token");
 
     try {
-      const response = await fetch("/api/assistant", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/assistant`, {
         method:  "POST",
         headers: {
-          "Content-Type":  "application/json",
-          "Authorization": `Bearer ${authToken}`,
+          "Content-Type": "application/json",
         },
         body:   JSON.stringify({ query: rawInput }),
         signal: controller.signal,
